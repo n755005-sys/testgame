@@ -9,6 +9,7 @@
 #include "Uploader.h"   // uploaderBegin(), uploaderLoop()
 #include "Pomodoro.h"   // startPomodoroWork(), stopPomodoro(), pomodoro* vars
 #include "Pokemon.h"    // pokemonMgr
+#include "AdminServer.h"  // WiFi + Admin backend
 #include "pixel_icons_rgb565.h"  // 你的圖示 header（預設 16x16）
 #include "pomodoro_icons.h"      // 新增：番茄鐘專用圖示
 #include "ui.h"      // <-- 要在用到 CHROMA565 之前 include
@@ -112,6 +113,7 @@ void setup(){
 
   uploaderBegin();
   pokemonMgr.begin();
+  adminBegin();
 
   // 指定怪獸動畫（依你的檔案調整）
   animSetMonster("monster_001", "frame", 2, CHROMA_KEY);
@@ -132,6 +134,7 @@ void loop() {
 
   uploaderLoop();
   pokemonMgr.update();
+  adminLoop();
 
   if (gUiState == UI_STUDY) {
     uiPomodoroTick();        // ← 每秒只更新時間，不閃爍

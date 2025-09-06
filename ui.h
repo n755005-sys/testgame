@@ -4,6 +4,7 @@
 #include "Anim.h"        // animLoopStep() for center monster
 #include "Pokemon.h"     // pokemonMgr feed/play
 #include "Pomodoro.h"    // pomodoro state/time
+#include "Backend.h"     // backend event hooks (pomodoro complete)
 
 #ifndef CHROMA565
 #define CHROMA565 0xF81F  // magenta as transparent key if you need one elsewhere
@@ -217,7 +218,14 @@ static inline void uiPomodoroEnter(){
 
 static inline void uiPomodoroTick(){
   static uint32_t lastSec = 0;
+  static PomodoroState prevState = STATE_IDLE;
+  PomodoroState before = pomodoroCurrentState;
   if (!gPomoPaused) pomodoroLoopStep();  // keep state machine running when not paused
+  // detect WORK -> REST transition (work completed)
+  if (before == STATE_WORK && pomodoroCurrentState == STATE_REST) {
+    backendOnPomodoroCompleted();
+  }
+  prevState = pomodoroCurrentState;
   uint32_t nowSec = millis()/1000;
   if (nowSec != lastSec){
     lastSec = nowSec;
